@@ -1,0 +1,10 @@
+fastapi==0.115.6
+uvicorn[standard]==0.32.1
+httpx==0.28.1
+pydantic==2.10.3
+langgraph==1.2.4
+pandas==2.2.3
+openpyxl==3.1.5
+matplotlib==3.9.2
+python-multipart==0.0.9
+numpy==2.1.3

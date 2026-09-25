@@ -1,0 +1,33 @@
+name: ai-data-analyst
+
+services:
+  backend:
+    build: ./backend
+    container_name: ada-backend
+    restart: unless-stopped
+    environment:
+      GROQ_API_KEY: ${GROQ_API_KEY}
+      GROQ_MODEL: openai/gpt-oss-20b
+    ports:
+      - "8002:8000"
+    volumes:
+      - ./backend/reports:/app/reports
+
+  n8n:
+    image: docker.n8n.io/n8nio/n8n:latest
+    container_name: ada-n8n
+    restart: unless-stopped
+    ports:
+      - "5679:5678"
+    environment:
+      N8N_HOST: localhost
+      N8N_PORT: 5678
+      N8N_PROTOCOL: http
+      WEBHOOK_URL: http://localhost:5679/
+      GENERIC_TIMEZONE: Asia/Kolkata
+      TZ: Asia/Kolkata
+    volumes:
+      - n8n_data:/home/node/.n8n
+
+volumes:
+  n8n_data:
