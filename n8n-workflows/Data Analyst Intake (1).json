@@ -1,0 +1,326 @@
+{
+  "name": "Data Analyst Intake",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "analyze",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "b85579bc-cb66-4044-a92a-b92cf90a07ad",
+      "name": "Webhook1",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        -1200,
+        160
+      ],
+      "webhookId": "da1-webhook-analyze-0001"
+    },
+    {
+      "parameters": {
+        "jsCode": "const item = $input.first();\nconst binary = item.binary?.file;\nconst filename = binary?.fileName || \"\";\nconst validExtensions = [\".csv\", \".xlsx\", \".xls\"];\nconst isValid = validExtensions.some(ext => filename.toLowerCase().endsWith(ext));\n\nreturn [{\n  json: {\n    ...item.json,\n    is_valid_file: isValid,\n    filename: filename,\n    error: isValid ? null : `Invalid file type. Got \"${filename}\", expected .csv, .xlsx, or .xls`\n  },\n  binary: item.binary\n}];"
+      },
+      "id": "fbf9b8e5-c330-49d4-83ce-d3076c859f9c",
+      "name": "Validate File",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -960,
+        160
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "da1-cond-0001",
+              "leftValue": "={{ $json.is_valid_file }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "4a849a61-78d6-4f0d-a24c-78dc4919eba1",
+      "name": "Valid File?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        -720,
+        160
+      ]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ { \"error\": $json.error } }}",
+        "options": {}
+      },
+      "id": "c895c463-727b-469c-866e-b54a16755d9f",
+      "name": "File Error Response",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [
+        -480,
+        304
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://host.docker.internal:8002/data/analyze",
+        "sendBody": true,
+        "contentType": "multipart-form-data",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "parameterType": "formBinaryData",
+              "name": "file",
+              "inputDataFieldName": "file"
+            }
+          ]
+        },
+        "options": {
+          "response": {
+            "response": {
+              "neverError": true
+            }
+          }
+        }
+      },
+      "id": "acd77033-81cb-42fe-9a34-cff7c060ede4",
+      "name": "Call Data Agent",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        -480,
+        80
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "da1-cond-0002",
+              "leftValue": "={{ $json.report_id }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "exists",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "ba3cf8be-a838-43a0-9ad9-fdde1c770672",
+      "name": "Analysis Successful?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        -240,
+        80
+      ]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ { \"error\": \"Analysis failed. Please check the file format and try again.\" } }}",
+        "options": {}
+      },
+      "id": "7124d914-f560-450c-b7c6-aa7a7c997d51",
+      "name": "Analysis Error Response",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [
+        0,
+        240
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://discord.com/api/webhooks/1553002038026182736/6HkDnLycyXd2S7LG5EbwvcT1bwm-xNgxpMp14FA8I20TqkDzL5jhw6JMcIFBDNxwbsaw",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"content\": \"📊 **Data Analysis Report**\\n{{ $json.telegram_summary.replace(/\\n/g, '\\\\n') }}\\n\\nFull report: http://localhost:8002{{ $json.report_url }}\"\n}",
+        "options": {}
+      },
+      "id": "3e6fd246-99d9-4d8c-a0cc-930154d41791",
+      "name": "Send Discord Alert",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        0,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ $json }}",
+        "options": {}
+      },
+      "id": "1a09f90a-3401-47b8-8212-10cbc95b8e51",
+      "name": "Success Response",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [
+        240,
+        0
+      ]
+    }
+  ],
+  "pinData": {
+    "Webhook1": [
+      {
+        "json": {
+          "headers": {
+            "host": "localhost:5678",
+            "user-agent": "curl/8.21.0",
+            "accept": "*/*",
+            "content-length": "405",
+            "content-type": "multipart/form-data; boundary=------------------------XKBcaoIehFFWxItEnVcYkw"
+          },
+          "params": {},
+          "query": {},
+          "body": {},
+          "webhookUrl": "http://localhost:5678/webhook/analyze",
+          "executionMode": "production"
+        },
+        "binary": {
+          "file": {
+            "mimeType": "application/octet-stream",
+            "fileExtension": "bin",
+            "data": "filesystem-v2",
+            "fileName": "sample.csv",
+            "id": "filesystem-v2:workflows/6aLVEEZU35Rj6MAr/executions/366/binary_data/e0d17c04-73eb-49de-b66c-ed5f78be539d",
+            "fileSize": "191 B",
+            "bytes": 191
+          }
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      }
+    ]
+  },
+  "connections": {
+    "Webhook1": {
+      "main": [
+        [
+          {
+            "node": "Validate File",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Validate File": {
+      "main": [
+        [
+          {
+            "node": "Valid File?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Valid File?": {
+      "main": [
+        [
+          {
+            "node": "Call Data Agent",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "File Error Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Call Data Agent": {
+      "main": [
+        [
+          {
+            "node": "Analysis Successful?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Analysis Successful?": {
+      "main": [
+        [
+          {
+            "node": "Send Discord Alert",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Analysis Error Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send Discord Alert": {
+      "main": [
+        [
+          {
+            "node": "Success Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "cba546de-e541-4273-96ba-874dbe04dbb8",
+  "meta": {
+    "instanceId": "9103808490d1f8dcfcdad0353050c08edcb8ff7e05047cf748ca3f42f40189b0"
+  },
+  "nodeGroups": [],
+  "id": "6aLVEEZU35Rj6MAr",
+  "tags": []
+}

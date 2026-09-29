@@ -37,6 +37,17 @@ flowchart TD
    - Renders a full HTML report with embedded charts (matplotlib, base64-inlined)
 4. n8n posts a summary + report link to Discord
 
+## Screenshots
+
+**n8n workflow — file validation, agent call, and Discord alerting**
+![n8n workflow](docs/Screenshot%202026-09-29%20115119.png)
+
+**Discord alert with AI-generated summary and report link**
+![Discord alert](docs/Screenshot%202026-09-29%20115139.png)
+
+**Generated HTML report — charts, forecast, and anomalies**
+![HTML report](docs/Screenshot%202026-09-29%20115353.png)
+
 ## Tech stack
 
 | Layer | Technology |
