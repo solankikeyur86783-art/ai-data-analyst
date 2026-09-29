@@ -1,0 +1,74 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>AI Data Analyst Dashboard</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.4/chart.umd.min.js"></script>
+<style>
+  :root{
+    --blue:#2563eb; --teal:#0ea5e9; --bg:#f4f6fb; --card:#ffffff;
+    --text:#1e293b; --muted:#64748b; --border:#e5e9f0; --green:#16a34a; --red:#dc2626;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{font-family:'Segoe UI',Arial,sans-serif;background:var(--bg);color:var(--text);display:flex;min-height:100vh;}
+  .sidebar{width:72px;background:#ffffff;border-right:1px solid var(--border);display:flex;flex-direction:column;align-items:center;padding:20px 0;gap:22px;}
+  .sidebar .logo{width:40px;height:40px;background:var(--blue);border-radius:10px;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;margin-bottom:10px;}
+  .sidebar .icon{width:22px;height:22px;stroke:var(--muted);cursor:pointer;}
+  .sidebar .icon.active{stroke:var(--blue);}
+  .main{flex:1;padding:28px 34px;max-width:1500px;}
+  header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:24px;flex-wrap:wrap;gap:16px;}
+  header h1{font-size:22px;}
+  header p{color:var(--blue);font-size:13px;font-weight:600;}
+  .upload-box{background:#fff;border:1px dashed var(--border);border-radius:10px;padding:10px 14px;display:flex;align-items:center;gap:10px;}
+  .upload-box input{font-size:12px;}
+  .btn{background:var(--blue);color:#fff;border:none;padding:9px 16px;border-radius:8px;font-size:13px;cursor:pointer;}
+  .kpi-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:16px;margin-bottom:22px;}
+  .kpi-card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:16px 18px;}
+  .kpi-card .label{font-size:12px;color:var(--muted);display:flex;align-items:center;gap:6px;margin-bottom:6px;}
+  .kpi-card .value{font-size:24px;font-weight:700;}
+  .grid-2{display:grid;grid-template-columns:2fr 1fr;gap:18px;margin-bottom:22px;}
+  .panel{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:18px;}
+  .panel h3{font-size:14px;margin-bottom:12px;}
+  table{width:100%;border-collapse:collapse;font-size:13px;}
+  th,td{text-align:left;padding:8px 6px;border-bottom:1px solid var(--border);}
+  th{color:var(--muted);font-weight:600;}
+  .insights{font-size:13px;line-height:1.6;color:var(--text);}
+  .empty{color:var(--muted);font-size:13px;text-align:center;padding:30px 0;}
+  #chatBubble{position:fixed;bottom:26px;right:26px;width:56px;height:56px;border-radius:50%;background:var(--blue);
+    display:flex;align-items:center;justify-content:center;cursor:pointer;box-shadow:0 8px 20px rgba(37,99,235,.35);z-index:50;}
+  #chatBubble svg{width:26px;height:26px;stroke:#fff;}
+  #chatPanel{position:fixed;bottom:96px;right:26px;width:340px;height:440px;background:#fff;border-radius:16px;
+    box-shadow:0 12px 40px rgba(0,0,0,.18);display:none;flex-direction:column;overflow:hidden;z-index:50;border:1px solid var(--border);}
+  #chatPanel.open{display:flex;}
+  .chat-head{background:var(--blue);color:#fff;padding:14px 16px;font-size:14px;font-weight:600;}
+  .chat-body{flex:1;padding:12px 14px;overflow-y:auto;font-size:13px;display:flex;flex-direction:column;gap:10px;}
+  .msg{max-width:85%;padding:8px 12px;border-radius:12px;line-height:1.4;}
+  .msg.bot{background:#eef2ff;color:var(--text);align-self:flex-start;border-bottom-left-radius:2px;}
+  .msg.user{background:var(--blue);color:#fff;align-self:flex-end;border-bottom-right-radius:2px;}
+  .chat-input{display:flex;border-top:1px solid var(--border);}
+  .chat-input input{flex:1;border:none;padding:12px;font-size:13px;outline:none;}
+  .chat-input button{background:var(--blue);color:#fff;border:none;padding:0 16px;cursor:pointer;}
+</style>
+</head>
+<body>
+<div class="sidebar">
+  <div class="logo">AI</div>
+  <svg class="icon active" viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M3 12l9-9 9 9"/><path d="M9 21V12h6v9"/></svg>
+  <svg class="icon" viewBox="0 0 24 24" fill="none" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+  <svg class="icon" viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M3 3v18h18"/><path d="M7 15l4-6 4 4 5-8"/></svg>
+</div>
+<div class="main">
+  <header>
+    <div>
+      <h1>AI Data Analysis</h1>
+      <p>Dashboard (static fallback page) &nbsp;</p>
+    </div>
+  </header>
+  <div class="panel">
+    <h3>Note</h3>
+    <div class="insights">Ye static fallback page hai jisse backend ka /dashboard mount crash na ho. React dashboard (localhost:5173) hi main dashboard hai.</div>
+  </div>
+</div>
+</body>
+</html>
